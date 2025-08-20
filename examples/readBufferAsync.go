@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"runtime"
 	"time"
@@ -23,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	device, err := camera.OpenDevice(context.Background(), "\\\\?\\usb#vid_2c7f&pid_2910&mi_00#8&2412c02a&0&0000#{e5323777-f976-4f5b-9b55-b94699c46e44}\\global")
+	device, err := camera.OpenDevice("\\\\?\\usb#vid_2c7f&pid_2910&mi_00#8&2412c02a&0&0000#{e5323777-f976-4f5b-9b55-b94699c46e44}\\global")
 	if err != nil {
 		panic(err)
 	}
