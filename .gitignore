@@ -14,4 +14,4 @@ go.work.sum
 .env
 .idea/
 .vscode/
-.test/
+test/
