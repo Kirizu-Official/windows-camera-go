@@ -65,6 +65,9 @@ func (i *IMFSourceReader) GetServiceForStream() (*IAMCameraControl, *IAMVideoPro
 	r1, _, _ = syscall.SyscallN(i.S.GetServiceForStream, uintptr(unsafe.Pointer(i)), uintptr(0xFFFFFFFF), uintptr(unsafe.Pointer(&guid.NULL)), uintptr(unsafe.Pointer(&guid.IID_IAMVideoProcAmp)), uintptr(unsafe.Pointer(&videoProc)))
 	if r1 != consts.S_OK {
 		//panic(r1)
+		if control != nil {
+			control.Release()
+		}
 		return nil, nil, consts.HResultError{Code: r1}
 	}
 	//err = service.GetExtendedCameraControl()
