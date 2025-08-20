@@ -3,6 +3,7 @@ package guid
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -33,11 +34,11 @@ func (g *GUID) SetString(str string) error {
 }
 
 func (g *GUID) MarshalJSON() ([]byte, error) {
-	return []byte(g.String()), nil
+	return []byte("\"" + g.String() + "\""), nil
 }
 
 func (g *GUID) UnmarshalJSON(b []byte) error {
-	return g.SetString(string(b))
+	return g.SetString(strings.Replace(string(b), "\"", "", -1))
 }
 
 func (g *GUID) MarshalYAML() (interface{}, error) {

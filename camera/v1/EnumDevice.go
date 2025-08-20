@@ -12,15 +12,16 @@ type DeviceInfo struct {
 	Name       string `json:"name" yaml:"name"`
 	SymbolLink string `json:"symbol_link" yaml:"symbol_link"`
 }
+
 type CaptureFormats struct {
-	DescriptorIndex    uint32
-	MediaTypeIndex     uint32
-	IsCompressedFormat bool
-	MajorType          *guid.GUID
-	SubType            *guid.GUID
-	Width              uint32
-	Height             uint32
-	Fps                float64
+	DescriptorIndex    uint32     `json:"descriptor_index" yaml:"descriptor_index"`
+	MediaTypeIndex     uint32     `json:"media_type_index" yaml:"media_type_index"`
+	IsCompressedFormat bool       `json:"is_compressed_format" yaml:"is_compressed_format"`
+	MajorType          *guid.GUID `json:"major_type" yaml:"major_type"`
+	SubType            *guid.GUID `json:"sub_type" yaml:"sub_type"`
+	Width              uint32     `json:"width" yaml:"width"`
+	Height             uint32     `json:"height" yaml:"height"`
+	Fps                float64    `json:"fps" yaml:"fps"`
 }
 
 func EnumDevice() ([]*DeviceInfo, error) {

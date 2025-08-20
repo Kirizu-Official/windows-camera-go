@@ -10,7 +10,7 @@ import (
 type CaptureConfig struct {
 	enableAsync bool
 	callBack    uintptr
-	mediaType   *CaptureFormats
+	MediaType   *CaptureFormats
 }
 type CaptureAsync struct {
 	Device   *Device
@@ -33,7 +33,7 @@ func (d *Device) StartCaptureAsync(mediaType *CaptureFormats) (*CaptureAsync, er
 	config := &CaptureConfig{
 		enableAsync: true,
 		callBack:    a.callback.ToUintptr(),
-		mediaType:   mediaType,
+		MediaType:   mediaType,
 	}
 	a.Config = config
 	err := d.startCapture(config)
@@ -49,7 +49,7 @@ func (d *Device) StartCapture(mediaType *CaptureFormats) (*CaptureSync, error) {
 	}
 	config := &CaptureConfig{
 		enableAsync: false,
-		mediaType:   mediaType,
+		MediaType:   mediaType,
 	}
 	err := d.startCapture(config)
 	if err != nil {
@@ -76,7 +76,7 @@ func (d *Device) startCapture(config *CaptureConfig) error {
 	}
 	d.config = config
 	var err error
-	d.pMediaType, err = d.getSelectedMediaType(config.mediaType)
+	d.pMediaType, err = d.getSelectedMediaType(config.MediaType)
 	if err != nil {
 		return err
 	}
@@ -225,4 +225,141 @@ func (d *Device) ParseSampleToBuffer(sample *mf.IMFSample) (buffer *CaptureBuffe
 		internalBuffer: cBuffer,
 		interSample:    sample,
 	}, nil
+}
+
+func (d *CaptureAsync) GetConfig() (*ConfigParameter, error) {
+	return d.Device.getConfig()
+}
+
+func (d *CaptureSync) GetConfig() (*ConfigParameter, error) {
+	return d.Device.getConfig()
+}
+
+// SetConfigWithCheck will call getConfig to diff the current config and the new config, then set the new config if they are different.
+func (d *CaptureSync) SetConfigWithCheck(newConfig *ConfigParameter) error {
+	return d.Device.setConfigWithCheck(newConfig)
+}
+func (d *CaptureAsync) SetConfigWithCheck(newConfig *ConfigParameter) error {
+	return d.Device.setConfigWithCheck(newConfig)
+}
+
+func (d *Device) setConfigWithCheck(newConfig *ConfigParameter) error {
+	if newConfig == nil {
+		return utils.ErrorParameterInvalid
+	}
+	currentConfig, err := d.getConfig()
+	if err != nil {
+		return err
+	}
+	cameraCtl, procImp, err := d.GetControl()
+	if err != nil {
+		return err
+	}
+	defer cameraCtl.Release()
+	defer procImp.Release()
+
+	if newConfig.Pan != currentConfig.Pan {
+		err = cameraCtl.Set(consts.CameraControl_Pan, newConfig.Pan.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Tilt != currentConfig.Tilt {
+		err = cameraCtl.Set(consts.CameraControl_Tilt, newConfig.Tilt.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Roll != currentConfig.Roll {
+		err = cameraCtl.Set(consts.CameraControl_Roll, newConfig.Roll.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Zoom != currentConfig.Zoom {
+		err = cameraCtl.Set(consts.CameraControl_Zoom, newConfig.Zoom.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Exposure != currentConfig.Exposure {
+		err = cameraCtl.Set(consts.CameraControl_Exposure, newConfig.Exposure.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Iris != currentConfig.Iris {
+		err = cameraCtl.Set(consts.CameraControl_Iris, newConfig.Iris.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Focus != currentConfig.Focus {
+		err = cameraCtl.Set(consts.CameraControl_Focus, newConfig.Focus.Current, consts.KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+
+	if newConfig.Brightness != currentConfig.Brightness {
+		err = procImp.Set(consts.VideoProcAmp_Brightness, newConfig.Brightness.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Contrast != currentConfig.Contrast {
+		err = procImp.Set(consts.VideoProcAmp_Contrast, newConfig.Contrast.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Hue != currentConfig.Hue {
+		err = procImp.Set(consts.VideoProcAmp_Hue, newConfig.Hue.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Saturation != currentConfig.Saturation {
+		err = procImp.Set(consts.VideoProcAmp_Saturation, newConfig.Saturation.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Sharpness != currentConfig.Sharpness {
+		err = procImp.Set(consts.VideoProcAmp_Sharpness, newConfig.Sharpness.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Gamma != currentConfig.Gamma {
+		err = procImp.Set(consts.VideoProcAmp_Gamma, newConfig.Gamma.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.ColorEnable != currentConfig.ColorEnable {
+		err = procImp.Set(consts.VideoProcAmp_ColorEnable, newConfig.ColorEnable.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.WhiteBalance != currentConfig.WhiteBalance {
+		err = procImp.Set(consts.VideoProcAmp_WhiteBalance, newConfig.WhiteBalance.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.BacklightCompensation != currentConfig.BacklightCompensation {
+		err = procImp.Set(consts.VideoProcAmp_BacklightCompensation, newConfig.BacklightCompensation.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	if newConfig.Gain != currentConfig.Gain {
+		err = procImp.Set(consts.VideoProcAmp_Gain, newConfig.Gain.Current, consts.KSPROPERTY_VIDEOPROCAMP_FLAGS_MANUAL)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
